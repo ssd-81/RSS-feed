@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/ssd-81/RSS-feed-/internal/config"
+)
 
 func main() {
-	fmt.Println("project initialized")
+	fmt.Println("started")
+	config.Read()
 }
