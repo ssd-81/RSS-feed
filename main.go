@@ -9,4 +9,5 @@ import (
 func main() {
 	fmt.Println("started")
 	config.Read()
+	fmt.Println("ended")
 }
