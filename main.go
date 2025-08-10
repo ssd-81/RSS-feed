@@ -8,6 +8,10 @@ import (
 
 func main() {
 	fmt.Println("started")
-	config.Read()
+	temp := config.Read()
+	temp.SetUser("genie")
+	newTemp := config.Read()
+	fmt.Println("I am new", newTemp)
+	fmt.Println(temp)
 	fmt.Println("ended")
 }

@@ -25,7 +25,6 @@ func Read() Config {
 		log.Fatalf("Failed to parse JSON: %v", err)
 		return Config{}
 	}
-	fmt.Println(c.Db_url)
 	return c
 }
 
@@ -43,10 +42,10 @@ func (c Config) SetUser(name string) {
 
 }
 
-func getConfigFilePath(configFileName string) (string, error) {
-	return "", nil
-}
+// func getConfigFilePath(configFileName string) (string, error) {
+// 	return "", nil
+// }
 
-func write(cfg Config) error {
-	return nil
-}
+// func write(cfg Config) error {
+// 	return nil
+// }
