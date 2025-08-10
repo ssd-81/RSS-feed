@@ -7,11 +7,14 @@ import (
 )
 
 func main() {
-	fmt.Println("started")
 	temp := config.Read()
-	temp.SetUser("genie")
-	newTemp := config.Read()
-	fmt.Println("I am new", newTemp)
-	fmt.Println(temp)
-	fmt.Println("ended")
+	ptrTemp := config.State{}
+	ptrTemp.State = &temp
+	fmt.Println(ptrTemp)
+	fmt.Println(ptrTemp.State.UserName)
+	fmt.Println(ptrTemp.State.Db_url)
+	// fmt.Println(temp)
+	// temp.SetUser("alex")
+	// temp = config.Read()
+	// fmt.Println(temp)
 }

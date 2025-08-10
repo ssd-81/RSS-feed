@@ -12,6 +12,10 @@ type Config struct {
 	UserName string `json:"current_user_name"`
 }
 
+type State struct {
+	State *Config
+}
+
 func Read() Config {
 
 	config, err := os.ReadFile(".gatorconfig.json")
@@ -41,11 +45,3 @@ func (c Config) SetUser(name string) {
 	fmt.Println("success")
 
 }
-
-// func getConfigFilePath(configFileName string) (string, error) {
-// 	return "", nil
-// }
-
-// func write(cfg Config) error {
-// 	return nil
-// }
