@@ -26,7 +26,7 @@ func HandlerLogin(s *config.State, cmd Command) error {
 
 
 // run  or Run
-func (c *Commands) run(s *config.State, cmd Command) error {
+func (c *Commands) Run(s *config.State, cmd Command) error {
 	// runs a given command with the provided state if it exists
 	value, ok := c.Map[cmd.Name]
 	if ok {
@@ -39,8 +39,8 @@ func (c *Commands) run(s *config.State, cmd Command) error {
 
 
 // register or Register
-func (c *Commands) register(name string, f func(*config.State, Command) error) {
-	c.Map[name] = f
-	
+func (c *Commands) Register(name string, f func(*config.State, Command) error) {
 	// registers a new handler function for a command name
+	c.Map[name] = f
+	// might need to check this function again based on actual usage
 }
