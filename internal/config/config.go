@@ -16,6 +16,15 @@ type State struct {
 	State *Config
 }
 
+// type Command struct {
+// 	Name      string
+// 	Arguments []string
+// }
+
+// type Commands struct {
+// 	Map map[string]func(*State, Command) error
+// }
+
 func Read() Config {
 
 	config, err := os.ReadFile(".gatorconfig.json")
@@ -45,3 +54,27 @@ func (c Config) SetUser(name string) {
 	fmt.Println("success")
 
 }
+
+// func HandlerLogin(s *State, cmd Command) error {
+// 	if len(cmd.Arguments) == 0 {
+// 		return fmt.Errorf("the login handler expects a single argument, the username")
+// 	}
+// 	s.State.UserName = cmd.Arguments[0]
+// 	fmt.Println("the user has been set successfully")
+// 	return nil
+// }
+
+// func (c *Commands) run(s *State, cmd Command) error {
+// 	// runs a given command with the provided state if it exists
+// 	value, ok := c.Map[cmd.Name]
+// 	if ok {
+
+// 	} else {
+
+// 	}
+// 	return nil
+// }
+
+// func (c *Commands) register(name string, f func(*State, Command)) {
+// 	// registers a new handler function for a command name
+// }
