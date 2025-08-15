@@ -9,17 +9,24 @@ import (
 )
 
 func main() {
-	fmt.Println("start")
 	temp := config.Read()
 	state := config.State{}
 	state.State = &temp
 	cmds := cli.Commands{}
 	// initialize map of handler functions for cmds
-	cmds.Map := make(map[string]func(*config.State, cli.Command)) // ?????
-	cmds.Register("login", cli.HandlerLogin)                      // ?????
-	if len(os.Args) < 2 {
-		fmt.Println("less than two command line arguments")
-		os.Exit(0)
+	cmds.Map = make(map[string]func(*config.State, cli.Command) error) // ?????
+	cmds.Register("login", cli.HandlerLogin)                           // ?????
+	argsWithoutProg := os.Args[1:]
+	if len(argsWithoutProg) == 0 {
+		fmt.Println("error: not enough arguments were provided")
+		os.Exit(1)
+	} else if len(argsWithoutProg) == 1 {
+		fmt.Println("error: username is required")
+		os.Exit(1)
+	} else if len(argsWithoutProg) == 2 {
+		temp.SetUser(argsWithoutProg[1])
 	}
+
+	fmt.Println(config.Read())
 
 }

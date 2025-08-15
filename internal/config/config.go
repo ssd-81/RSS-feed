@@ -27,7 +27,10 @@ type State struct {
 
 func Read() Config {
 
-	config, err := os.ReadFile(".gatorconfig.json")
+	// config, err := os.ReadFile("~/.gatorconfig.json")
+	// config, err := os.ReadFile("/.gatorconfig.json")
+	config, err := os.ReadFile("/test.txt")
+
 	if err != nil {
 		log.Fatalf("Failed to read file: %v", err)
 		return Config{}
