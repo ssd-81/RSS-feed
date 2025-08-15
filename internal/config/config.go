@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 type Config struct {
@@ -29,7 +30,13 @@ func Read() Config {
 
 	// config, err := os.ReadFile("~/.gatorconfig.json")
 	// config, err := os.ReadFile("/.gatorconfig.json")
-	config, err := os.ReadFile("/test.txt")
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("home path unavailable")
+		return Config{}
+	}
+	path := filepath.Join(homePath, ".gatorconfig.json")
+	config, err := os.ReadFile(path)
 
 	if err != nil {
 		log.Fatalf("Failed to read file: %v", err)
@@ -50,7 +57,13 @@ func (c Config) SetUser(name string) {
 	if err != nil {
 		panic(err)
 	}
-	err = os.WriteFile(".gatorconfig.json", newData, 0644)
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("home path unavailable")
+		return
+	}
+	path := filepath.Join(homePath, ".gatorconfig.json")
+	err = os.WriteFile(path, newData, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
