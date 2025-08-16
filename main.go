@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	_ "github.com/lib/pq"
+
 	"github.com/ssd-81/RSS-feed-/internal/cli"
 	"github.com/ssd-81/RSS-feed-/internal/config"
 )
