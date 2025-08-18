@@ -13,23 +13,18 @@ type Config struct {
 	UserName string `json:"current_user_name"`
 }
 
-type State struct {
-	State *Config
-}
+// type State struct {
+// 	State *Config
+// }
 
 // type Command struct {
 // 	Name      string
 // 	Arguments []string
 // }
 
-// type Commands struct {
-// 	Map map[string]func(*State, Command) error
-// }
 
 func Read() Config {
 
-	// config, err := os.ReadFile("~/.gatorconfig.json")
-	// config, err := os.ReadFile("/.gatorconfig.json")
 	homePath, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Println("home path unavailable")
