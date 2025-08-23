@@ -35,6 +35,7 @@ func HandlerRegister(s *types.State, cmd Command) error {
 		return fmt.Errorf("the register command expects a single argument, the username")
 	}
 
+
 	// checking if the user already exists in the database
 	// and exit prematurely if the user already exists
 	_, err := s.Db.GetUser(context.Background(), cmd.Arguments[1])
@@ -70,9 +71,9 @@ func (c *Commands) Run(s *types.State, cmd Command) error {
 	return nil
 }
 
-// register or Register
+
 func (c *Commands) Register(name string, f func(*types.State, Command) error) {
-	// registers a new handler function for a command name
+	//  registers a new handler function for a command name
 	c.Map[name] = f
-	// might need to check this function again based on actual usage
+	//  might need to check this function again based on actual usage
 }
