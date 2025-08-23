@@ -25,21 +25,24 @@ func HandlerLogin(s *types.State, cmd Command) error {
 	if len(cmd.Arguments) == 0 {
 		return fmt.Errorf("the login handler expects a single argument, the username")
 	}
-	s.Cfg.UserName = cmd.Arguments[0]
+	s.Cfg.SetUser(cmd.Arguments[0])
+	// s.Cfg.UserName = cmd.Arguments[0]
 	fmt.Println("the user has been set successfully")
 	return nil
 }
 
 func HandlerRegister(s *types.State, cmd Command) error {
+	fmt.Println(cmd.Arguments)
 	if len(cmd.Arguments) == 0 {
 		return fmt.Errorf("the register command expects a single argument, the username")
 	}
 
-
 	// checking if the user already exists in the database
 	// and exit prematurely if the user already exists
-	_, err := s.Db.GetUser(context.Background(), cmd.Arguments[1])
+	_, err := s.Db.GetUser(context.Background(), cmd.Arguments[0])
+
 	if err == nil {
+		fmt.Println("the user already exists in the database")
 		os.Exit(1)
 	}
 
@@ -48,9 +51,12 @@ func HandlerRegister(s *types.State, cmd Command) error {
 		ID:        uuid.NullUUID{UUID: uuid.New(), Valid: true},
 		CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
 		UpdatedAt: sql.NullTime{Time: time.Now(), Valid: true},
-		Name:      cmd.Arguments[1],
+		Name:      cmd.Arguments[0],
 	}
+	fmt.Println("0x2: i was executed")
+
 	user, err := s.Db.CreateUser(context.Background(), params)
+	fmt.Println("0x3: ", err)
 	if err != nil {
 		return fmt.Errorf("could not create the %s user in the database", params.Name)
 	}
@@ -70,7 +76,6 @@ func (c *Commands) Run(s *types.State, cmd Command) error {
 	}
 	return nil
 }
-
 
 func (c *Commands) Register(name string, f func(*types.State, Command) error) {
 	//  registers a new handler function for a command name

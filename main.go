@@ -31,7 +31,7 @@ func main() {
 	// creating new *database.Queries
 	dbQueries := database.New(db)
 	stateData := types.State{
-		Cfg: &configData,
+		Cfg: configData,
 		Db:  dbQueries,
 	}
 
@@ -55,19 +55,9 @@ func main() {
 	if err := cmds.Run(&stateData, cmd); err != nil {
 		log.Fatal(err)
 	} else {
-		fmt.Println("success")
+		fmt.Println("command",cmd.Name, "was executed" )
 	}
 
-	// if len(argsWithoutProg) == 0 {
-	// 	fmt.Println("error: not enough arguments were provided")
-	// 	os.Exit(1)
-	// } else if len(argsWithoutProg) == 1 {
-	// 	fmt.Println("error: username is required")
-	// 	os.Exit(1)
-	// } else if len(argsWithoutProg) == 2 {
-	// 	stateData.Cfg.SetUser(argsWithoutProg[1])
-	// }
-
-	fmt.Println(config.Read())
+	// fmt.Println(config.Read())
 
 }

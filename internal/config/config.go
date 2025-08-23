@@ -13,9 +13,6 @@ type Config struct {
 	UserName string `json:"current_user_name"`
 }
 
-// type State struct {
-// 	State *Config
-// }
 
 // type Command struct {
 // 	Name      string
@@ -23,27 +20,27 @@ type Config struct {
 // }
 
 
-func Read() Config {
+func Read() *Config {
 
 	homePath, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Println("home path unavailable")
-		return Config{}
+		return &Config{}
 	}
 	path := filepath.Join(homePath, ".gatorconfig.json")
 	config, err := os.ReadFile(path)
 
 	if err != nil {
 		log.Fatalf("Failed to read file: %v", err)
-		return Config{}
+		return &Config{}
 	}
 	var c Config
 	err = json.Unmarshal(config, &c)
 	if err != nil {
 		log.Fatalf("Failed to parse JSON: %v", err)
-		return Config{}
+		return &Config{}
 	}
-	return c
+	return &c
 }
 
 func (c Config) SetUser(name string) {
