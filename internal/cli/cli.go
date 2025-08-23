@@ -25,14 +25,23 @@ func HandlerLogin(s *types.State, cmd Command) error {
 	if len(cmd.Arguments) == 0 {
 		return fmt.Errorf("the login handler expects a single argument, the username")
 	}
+	// change the logic to check if the user exists in the database;
+	username := cmd.Arguments[0]
+	_, err := s.Db.GetUser(context.Background(), username)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("the user does not exist in the database")
+		}
+		return fmt.Errorf("some unexpected error came up")
+
+	}
 	s.Cfg.SetUser(cmd.Arguments[0])
-	// s.Cfg.UserName = cmd.Arguments[0]
 	fmt.Println("the user has been set successfully")
 	return nil
 }
 
 func HandlerRegister(s *types.State, cmd Command) error {
-	fmt.Println(cmd.Arguments)
 	if len(cmd.Arguments) == 0 {
 		return fmt.Errorf("the register command expects a single argument, the username")
 	}
@@ -53,24 +62,25 @@ func HandlerRegister(s *types.State, cmd Command) error {
 		UpdatedAt: sql.NullTime{Time: time.Now(), Valid: true},
 		Name:      cmd.Arguments[0],
 	}
-	fmt.Println("0x2: i was executed")
 
 	user, err := s.Db.CreateUser(context.Background(), params)
-	fmt.Println("0x3: ", err)
 	if err != nil {
 		return fmt.Errorf("could not create the %s user in the database", params.Name)
 	}
+	s.Cfg.SetUser(params.Name)
 	fmt.Println("user: ", user, " was successfuly registered in database")
 
 	return nil
 }
 
-// run  or Run
 func (c *Commands) Run(s *types.State, cmd Command) error {
 	// runs a given command with the provided state if it exists
 	value, ok := c.Map[cmd.Name]
 	if ok {
-		value(s, cmd)
+		err := value(s, cmd)
+		if err != nil {
+			fmt.Println(err)
+		}
 	} else {
 		return fmt.Errorf("command does not exist in CLI")
 	}
@@ -80,5 +90,4 @@ func (c *Commands) Run(s *types.State, cmd Command) error {
 func (c *Commands) Register(name string, f func(*types.State, Command) error) {
 	//  registers a new handler function for a command name
 	c.Map[name] = f
-	//  might need to check this function again based on actual usage
 }

@@ -53,9 +53,10 @@ func main() {
 
 	// func signature of Run : func (c *Commands) Run(s *types.State, cmd Command) error
 	if err := cmds.Run(&stateData, cmd); err != nil {
+		fmt.Println(err)
 		log.Fatal(err)
 	} else {
-		fmt.Println("command",cmd.Name, "was executed" )
+		fmt.Println("command", cmd.Name, "was executed")
 	}
 
 	// fmt.Println(config.Read())
