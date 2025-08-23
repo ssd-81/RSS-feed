@@ -40,6 +40,8 @@ func main() {
 	cmds.Map = make(map[string]func(*types.State, cli.Command) error)
 	cmds.Register("login", cli.HandlerLogin)
 	cmds.Register("register", cli.HandlerRegister)
+	cmds.Register("reset", cli.HandlerReset)
+	cmds.Register("users", cli.HandlerUsers)
 
 	args := os.Args[1:]
 	if len(args) < 1 {

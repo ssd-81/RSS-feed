@@ -31,7 +31,7 @@ func HandlerLogin(s *types.State, cmd Command) error {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return fmt.Errorf("the user does not exist in the database")
+			os.Exit(1)
 		}
 		return fmt.Errorf("some unexpected error came up")
 
@@ -73,13 +73,38 @@ func HandlerRegister(s *types.State, cmd Command) error {
 	return nil
 }
 
+func HandlerReset(s *types.State, cmd Command) error {
+
+	err := s.Db.DeleteAll(context.Background())
+	if err != nil {
+		fmt.Println("deletion of all rows unsuccessful")
+		os.Exit(1)
+	}
+	return nil
+}
+
+func HandlerUsers(s *types.State, cmd Command) error {
+	users, err := s.Db.GetUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("could not retrieve users from the database")
+	}
+	for _, value := range users {
+		if value.Name == s.Cfg.UserName {
+			fmt.Println("*", value.Name , "(current)")
+		}
+		fmt.Println("*", value.Name)
+	}
+	return nil 
+}
+
 func (c *Commands) Run(s *types.State, cmd Command) error {
 	// runs a given command with the provided state if it exists
 	value, ok := c.Map[cmd.Name]
 	if ok {
 		err := value(s, cmd)
+		// catching any error from the handler function
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
 	} else {
 		return fmt.Errorf("command does not exist in CLI")
