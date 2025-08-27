@@ -38,9 +38,9 @@ func main() {
 	cmds.Register("register", cli.HandlerRegister)
 	cmds.Register("reset", cli.HandlerReset)
 	cmds.Register("users", cli.HandlerUsers)
+	cmds.Register("agg", cli.HandlerAgg)
 
 	// cmds.Register("agg", rss.fetchFeed)  : this won't work, because it does not have the same function signature
-	// 
 
 	args := os.Args[1:]
 	if len(args) < 1 {
