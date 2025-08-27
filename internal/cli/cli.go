@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/ssd-81/RSS-feed-/internal/database"
 	"github.com/ssd-81/RSS-feed-/internal/types"
+	"github.com/ssd-81/RSS-feed-/internal/rss"
 )
 
 type Command struct {
@@ -94,6 +95,23 @@ func HandlerUsers(s *types.State, cmd Command) error {
 		}
 		fmt.Println("*", value.Name)
 	}
+	return nil 
+}
+
+func HandlerAgg(s *types.State, cmd Command) error {
+	// to be applied
+	if len(cmd.Arguments) == 0 {
+		return fmt.Errorf("the command agg requires a single argument: the feed url")
+	}
+	url := cmd.Arguments[0]
+	rssData, err  := rss.FetchFeed(context.Background(), url)
+	if err != nil {
+		return fmt.Errorf("error encounterd : %w", err)
+	}
+	rss.DecodeEscapedChars(rssData)
+	fmt.Println(rssData)
+	fmt.Println("agg command executed successfully")
+
 	return nil 
 }
 
