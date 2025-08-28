@@ -100,10 +100,10 @@ func HandlerUsers(s *types.State, cmd Command) error {
 
 func HandlerAgg(s *types.State, cmd Command) error {
 	// to be applied
-	if len(cmd.Arguments) == 0 {
-		return fmt.Errorf("the command agg requires a single argument: the feed url")
-	}
-	url := cmd.Arguments[0]
+	// if len(cmd.Arguments) == 0 {
+	// 	return fmt.Errorf("the command agg requires a single argument: the feed url")
+	// }
+	url := "https://www.wagslane.dev/index.xml"
 	rssData, err  := rss.FetchFeed(context.Background(), url)
 	if err != nil {
 		return fmt.Errorf("error encounterd : %w", err)
