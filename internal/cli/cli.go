@@ -58,7 +58,8 @@ func HandlerRegister(s *types.State, cmd Command) error {
 
 	// creating arg for passing to CreateUser function
 	params := database.CreateUserParams{
-		ID:        uuid.NullUUID{UUID: uuid.New(), Valid: true},
+		// ID:        uuid.NullUUID{UUID: uuid.NewUUID(), Valid: true},
+		ID: uuid.New(),
 		CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
 		UpdatedAt: sql.NullTime{Time: time.Now(), Valid: true},
 		Name:      cmd.Arguments[0],
