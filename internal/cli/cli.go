@@ -127,7 +127,11 @@ func HandlerAddfeed(s *types.State, cmd Command) error {
 		return fmt.Errorf("the register command expects a two argument, the name and the url")
 	}
 
-	// userName := s.Cfg.UserName
+	currentUserID, err := s.Db.GetUserIDFromName(context.Background(), s.Cfg.UserName)
+	if err != nil {
+		fmt.Println("could not get the user id for username:", s.Cfg.UserName)
+		return err
+	}
 
 	params := database.AddfeedParams{
 		ID:        uuid.New(),
@@ -135,8 +139,7 @@ func HandlerAddfeed(s *types.State, cmd Command) error {
 		UpdatedAt: sql.NullTime{Time: time.Now(), Valid: true},
 		Name:      sql.NullString{String: cmd.Arguments[0], Valid: true},
 		Url:       sql.NullString{String: cmd.Arguments[1], Valid: true},
-		// not so sure about this one
-		UserID: uuid.NullUUID{},
+		UserID: uuid.NullUUID{UUID: currentUserID, Valid:true},
 	}
 	// sql.NullString{String: cmd.Arguments, Valid: true}
 
