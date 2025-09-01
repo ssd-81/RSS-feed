@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const addfeed = `-- name: addfeed :one
+const addfeed = `-- name: Addfeed :one
 INSERT INTO feeds (id, created_at, updated_at, name, url, user_id)
 VALUES (
     $1,
@@ -25,7 +25,7 @@ VALUES (
 RETURNING id, created_at, updated_at, name, url, user_id
 `
 
-type addfeedParams struct {
+type AddfeedParams struct {
 	ID        uuid.UUID
 	CreatedAt sql.NullTime
 	UpdatedAt sql.NullTime
@@ -34,7 +34,7 @@ type addfeedParams struct {
 	UserID    uuid.NullUUID
 }
 
-func (q *Queries) addfeed(ctx context.Context, arg addfeedParams) (Feed, error) {
+func (q *Queries) Addfeed(ctx context.Context, arg AddfeedParams) (Feed, error) {
 	row := q.db.QueryRowContext(ctx, addfeed,
 		arg.ID,
 		arg.CreatedAt,
@@ -43,6 +43,34 @@ func (q *Queries) addfeed(ctx context.Context, arg addfeedParams) (Feed, error) 
 		arg.Url,
 		arg.UserID,
 	)
+	var i Feed
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+		&i.Url,
+		&i.UserID,
+	)
+	return i, err
+}
+
+const deleteAllFeeds = `-- name: DeleteAllFeeds :exec
+DELETE FROM feeds
+`
+
+func (q *Queries) DeleteAllFeeds(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, deleteAllFeeds)
+	return err
+}
+
+const getFeed = `-- name: GetFeed :one
+SELECT id, created_at, updated_at, name, url, user_id FROM feeds 
+WHERE name = $1 LIMIT 1
+`
+
+func (q *Queries) GetFeed(ctx context.Context, name sql.NullString) (Feed, error) {
+	row := q.db.QueryRowContext(ctx, getFeed, name)
 	var i Feed
 	err := row.Scan(
 		&i.ID,

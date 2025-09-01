@@ -43,7 +43,7 @@ func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	if err != nil {
 		return nil, errors.New("the body could not be parsed")
 	}
-	// I am not very sure with this, this might cause some problems 
+	// I am not very sure with this, this might cause some problems
 	var rssData RSSFeed
 	err = xml.Unmarshal(body, &rssData)
 	if err != nil {
@@ -53,27 +53,10 @@ func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	return &rssData, nil
 }
 
-// type RSSFeed struct {
-// 	Channel struct {
-// 		Title       string    `xml:"title"`
-// 		Link        string    `xml:"link"`
-// 		Description string    `xml:"description"`
-// 		Item        []RSSItem `xml:"item"`
-// 	} `xml:"channel"`
-// }
-
-// type RSSItem struct {
-// 	Title       string `xml:"title"`
-// 	Link        string `xml:"link"`
-// 	Description string `xml:"description"`
-// 	PubDate     string `xml:"pubDate"`
-// }
-
-
-func DecodeEscapedChars(r *RSSFeed){
+func DecodeEscapedChars(r *RSSFeed) {
 	r.Channel.Title = html.EscapeString(r.Channel.Title)
 	r.Channel.Description = html.EscapeString(r.Channel.Description)
-	// just make sure the changes made actually reflect in the original original variable 
+	// just make sure the changes made actually reflect in the original  variable
 	for i := range r.Channel.Item {
 		r.Channel.Item[i].Title = html.EscapeString(r.Channel.Item[i].Title)
 		r.Channel.Item[i].Description = html.EscapeString(r.Channel.Item[i].Description)

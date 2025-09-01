@@ -1,4 +1,4 @@
--- name: addfeed :one
+-- name: Addfeed :one
 INSERT INTO feeds (id, created_at, updated_at, name, url, user_id)
 VALUES (
     $1,
@@ -9,3 +9,11 @@ VALUES (
     $6
 )
 RETURNING *;
+
+-- name: GetFeed :one
+SELECT * FROM feeds 
+WHERE name = $1 LIMIT 1;
+
+-- name: DeleteAllFeeds :exec
+DELETE FROM feeds;
+

@@ -39,6 +39,7 @@ func main() {
 	cmds.Register("reset", cli.HandlerReset)
 	cmds.Register("users", cli.HandlerUsers)
 	cmds.Register("agg", cli.HandlerAgg)
+	cmds.Register("addfeed", cli.HandlerAddfeed)
 
 	// cmds.Register("agg", rss.fetchFeed)  : this won't work, because it does not have the same function signature
 
@@ -60,6 +61,5 @@ func main() {
 		fmt.Println("command", cmd.Name, "was executed")
 	}
 
-	// fmt.Println(config.Read())
 
 }

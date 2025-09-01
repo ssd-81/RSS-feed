@@ -9,8 +9,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/ssd-81/RSS-feed-/internal/database"
-	"github.com/ssd-81/RSS-feed-/internal/types"
 	"github.com/ssd-81/RSS-feed-/internal/rss"
+	"github.com/ssd-81/RSS-feed-/internal/types"
 )
 
 type Command struct {
@@ -59,7 +59,7 @@ func HandlerRegister(s *types.State, cmd Command) error {
 	// creating arg for passing to CreateUser function
 	params := database.CreateUserParams{
 		// ID:        uuid.NullUUID{UUID: uuid.NewUUID(), Valid: true},
-		ID: uuid.New(),
+		ID:        uuid.New(),
 		CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
 		UpdatedAt: sql.NullTime{Time: time.Now(), Valid: true},
 		Name:      cmd.Arguments[0],
@@ -77,9 +77,14 @@ func HandlerRegister(s *types.State, cmd Command) error {
 
 func HandlerReset(s *types.State, cmd Command) error {
 
-	err := s.Db.DeleteAll(context.Background())
+	err := s.Db.DeleteAllUsers(context.Background())
 	if err != nil {
 		fmt.Println("deletion of all rows unsuccessful")
+		os.Exit(1)
+	}
+	err = s.Db.DeleteAllFeeds(context.Background())
+	if err != nil {
+		fmt.Println("deletion of all feeds unsuccessful")
 		os.Exit(1)
 	}
 	return nil
@@ -92,11 +97,11 @@ func HandlerUsers(s *types.State, cmd Command) error {
 	}
 	for _, value := range users {
 		if value.Name == s.Cfg.UserName {
-			fmt.Println("*", value.Name , "(current)")
+			fmt.Println("*", value.Name, "(current)")
 		}
 		fmt.Println("*", value.Name)
 	}
-	return nil 
+	return nil
 }
 
 func HandlerAgg(s *types.State, cmd Command) error {
@@ -105,7 +110,7 @@ func HandlerAgg(s *types.State, cmd Command) error {
 	// 	return fmt.Errorf("the command agg requires a single argument: the feed url")
 	// }
 	url := "https://www.wagslane.dev/index.xml"
-	rssData, err  := rss.FetchFeed(context.Background(), url)
+	rssData, err := rss.FetchFeed(context.Background(), url)
 	if err != nil {
 		return fmt.Errorf("error encounterd : %w", err)
 	}
@@ -113,7 +118,37 @@ func HandlerAgg(s *types.State, cmd Command) error {
 	fmt.Println(rssData)
 	fmt.Println("agg command executed successfully")
 
-	return nil 
+	return nil
+}
+
+func HandlerAddfeed(s *types.State, cmd Command) error {
+
+	if len(cmd.Arguments) < 2 {
+		return fmt.Errorf("the register command expects a two argument, the name and the url")
+	}
+
+	// userName := s.Cfg.UserName
+
+	params := database.AddfeedParams{
+		ID:        uuid.New(),
+		CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
+		UpdatedAt: sql.NullTime{Time: time.Now(), Valid: true},
+		Name:      sql.NullString{String: cmd.Arguments[0], Valid: true},
+		Url:       sql.NullString{String: cmd.Arguments[1], Valid: true},
+		// not so sure about this one
+		UserID: uuid.NullUUID{},
+	}
+	// sql.NullString{String: cmd.Arguments, Valid: true}
+
+	feed, err := s.Db.Addfeed(context.Background(), params)
+	if err != nil {
+		fmt.Println("error encountered", err)
+		return err
+	}
+	fmt.Println("feed successfully saved to database")
+	fmt.Println(feed)
+
+	return nil
 }
 
 func (c *Commands) Run(s *types.State, cmd Command) error {
