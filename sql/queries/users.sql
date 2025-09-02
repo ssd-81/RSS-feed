@@ -21,3 +21,7 @@ SELECT * FROM users;
 -- name: GetUserIDFromName :one
 SELECT id from users 
 WHERE name = $1 LIMIT 1;
+
+-- name: GetNameFromUserID :one
+SELECT name FROM users
+WHERE id = $1 LIMIT 1;

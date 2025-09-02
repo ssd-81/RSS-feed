@@ -98,8 +98,9 @@ func HandlerUsers(s *types.State, cmd Command) error {
 	for _, value := range users {
 		if value.Name == s.Cfg.UserName {
 			fmt.Println("*", value.Name, "(current)")
+		} else {
+			fmt.Println("*", value.Name)
 		}
-		fmt.Println("*", value.Name)
 	}
 	return nil
 }
@@ -139,7 +140,7 @@ func HandlerAddfeed(s *types.State, cmd Command) error {
 		UpdatedAt: sql.NullTime{Time: time.Now(), Valid: true},
 		Name:      sql.NullString{String: cmd.Arguments[0], Valid: true},
 		Url:       sql.NullString{String: cmd.Arguments[1], Valid: true},
-		UserID: uuid.NullUUID{UUID: currentUserID, Valid:true},
+		UserID:    uuid.NullUUID{UUID: currentUserID, Valid: true},
 	}
 	// sql.NullString{String: cmd.Arguments, Valid: true}
 
@@ -152,6 +153,28 @@ func HandlerAddfeed(s *types.State, cmd Command) error {
 	fmt.Println(feed)
 
 	return nil
+}
+
+func HandlerFeeds(s *types.State, cmd Command) error {
+	// use the s.Db.GetFeeds function to get access to []Feeds, then you figure out on your own
+	feeds, err := s.Db.GetFeeds(context.Background())
+	if err != nil {
+		return fmt.Errorf("their was error while retrieving feeds from the db")
+	}
+	for _, value := range feeds {
+		fmt.Println(">", value.Name.String)
+		fmt.Println(" ", value.Url.String)
+		// not handling the error cases
+		username, err:= s.Db.GetNameFromUserID(context.Background(), value.UserID.UUID)
+		if err != nil {
+			fmt.Println(err, "was encountered")
+		}
+		fmt.Println(" ", username)
+		fmt.Println()
+
+	}
+	return nil
+
 }
 
 func (c *Commands) Run(s *types.State, cmd Command) error {
