@@ -165,7 +165,7 @@ func HandlerFeeds(s *types.State, cmd Command) error {
 		fmt.Println(">", value.Name.String)
 		fmt.Println(" ", value.Url.String)
 		// not handling the error cases
-		username, err:= s.Db.GetNameFromUserID(context.Background(), value.UserID.UUID)
+		username, err := s.Db.GetNameFromUserID(context.Background(), value.UserID.UUID)
 		if err != nil {
 			fmt.Println(err, "was encountered")
 		}
@@ -175,6 +175,37 @@ func HandlerFeeds(s *types.State, cmd Command) error {
 	}
 	return nil
 
+}
+
+func HandlerFollow(s *types.State, cmd Command) error {
+	if len(cmd.Arguments) == 0 {
+		return fmt.Errorf("the command follow expects a single argument, the url of the rss feed")
+	}
+	// url := cmd.Arguments[0]
+	// make great amount of checks in these
+	currUser := s.Cfg.UserName
+	userID, _ := s.Db.GetUserIDFromName(context.Background(), currUser)
+	url := sql.NullString{String: cmd.Arguments[0], Valid: true}
+	feedID, _ := s.Db.GetFeedIdFromUrl(context.Background(), url)
+
+	params := database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
+		UpdatedAt: sql.NullTime{Time: time.Now(), Valid: true},
+		// UserID: userID,
+		// FeedID: feedID,
+		UserID: uuid.NullUUID{UUID: userID, Valid: true},
+		FeedID: uuid.NullUUID{UUID: feedID, Valid: true},
+	}
+	feed_follow, err := s.Db.CreateFeedFollow(context.Background(), params)
+	if err != nil {
+		return fmt.Errorf("error encountered while handling command follow: %v", err)
+	}
+	feedName, _ := s.Db.GetFeedNameFromFeedId(context.Background(), feed_follow.ID)
+	fmt.Println(feedName)
+	fmt.Println(currUser)
+
+	return nil
 }
 
 func (c *Commands) Run(s *types.State, cmd Command) error {

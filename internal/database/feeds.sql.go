@@ -83,6 +83,30 @@ func (q *Queries) GetFeed(ctx context.Context, name sql.NullString) (Feed, error
 	return i, err
 }
 
+const getFeedIdFromUrl = `-- name: GetFeedIdFromUrl :one
+SELECT id from feeds 
+WHERE url = $1 LIMIT 1
+`
+
+func (q *Queries) GetFeedIdFromUrl(ctx context.Context, url sql.NullString) (uuid.UUID, error) {
+	row := q.db.QueryRowContext(ctx, getFeedIdFromUrl, url)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getFeedNameFromFeedId = `-- name: GetFeedNameFromFeedId :one
+SELECT name from feeds 
+WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetFeedNameFromFeedId(ctx context.Context, id uuid.UUID) (sql.NullString, error) {
+	row := q.db.QueryRowContext(ctx, getFeedNameFromFeedId, id)
+	var name sql.NullString
+	err := row.Scan(&name)
+	return name, err
+}
+
 const getFeeds = `-- name: GetFeeds :many
 SELECT id, created_at, updated_at, name, url, user_id FROM feeds
 `
