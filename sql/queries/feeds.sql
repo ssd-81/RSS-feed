@@ -26,4 +26,4 @@ WHERE url = $1 LIMIT 1;
 
 -- name: GetFeedNameFromFeedId :one
 SELECT name from feeds 
-WHERE id = $1 LIMIT 1;
+WHERE id = $1 LIMIT 1;  

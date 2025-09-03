@@ -201,10 +201,31 @@ func HandlerFollow(s *types.State, cmd Command) error {
 	if err != nil {
 		return fmt.Errorf("error encountered while handling command follow: %v", err)
 	}
-	feedName, _ := s.Db.GetFeedNameFromFeedId(context.Background(), feed_follow.ID)
+	feedName, _ := s.Db.GetFeedNameFromFeedId(context.Background(), feed_follow.FeedID.UUID)
 	fmt.Println(feedName)
 	fmt.Println(currUser)
 
+	return nil
+}
+
+func HandlerFollowing(s *types.State, cmd Command) error {
+	if len(cmd.Arguments) == 0 {
+		return fmt.Errorf("the command following expects a single argument: the name of the user")
+	}
+	userId, err := s.Db.GetUserIDFromName(context.Background(), cmd.Arguments[0])
+	if err != nil {
+		return fmt.Errorf("the user %v could not found in the database", userId)
+	}
+	// userId := uuid.NullUUID{}
+	formattedId := uuid.NullUUID{UUID: userId, Valid: true}
+	feeds, _ := s.Db.GetFeedFollowsForUser(context.Background(), formattedId)
+	for i, feed := range feeds {
+		feedName, err := s.Db.GetFeedNameFromFeedId(context.Background(), feed.FeedID.UUID)
+		if err != nil {
+			return fmt.Errorf("error encountered; %w", err)
+		}
+		fmt.Println(i+1, feedName.String)
+	}
 	return nil
 }
 
