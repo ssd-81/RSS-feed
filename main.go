@@ -12,6 +12,7 @@ import (
 	"github.com/ssd-81/RSS-feed-/internal/config"
 	"github.com/ssd-81/RSS-feed-/internal/database"
 	"github.com/ssd-81/RSS-feed-/internal/types"
+	"github.com/ssd-81/RSS-feed-/middleware"
 )
 
 func main() {
@@ -39,10 +40,10 @@ func main() {
 	cmds.Register("reset", cli.HandlerReset)
 	cmds.Register("users", cli.HandlerUsers)
 	cmds.Register("agg", cli.HandlerAgg)
-	cmds.Register("addfeed", cli.HandlerAddfeed)
+	cmds.Register("addfeed", middleware.MiddlewareLoggedIn(cli.HandlerAddfeed))
 	cmds.Register("feeds", cli.HandlerFeeds)
-	cmds.Register("follow", cli.HandlerFollow)
-	cmds.Register("following", cli.HandlerFollowing)
+	cmds.Register("follow", middleware.MiddlewareLoggedIn(cli.HandlerFollow))
+	cmds.Register("following", middleware.MiddlewareLoggedIn(cli.HandlerFollowing))
 
 	// cmds.Register("agg", rss.fetchFeed)  : this won't work, because it does not have the same function signature
 
@@ -63,6 +64,5 @@ func main() {
 	} else {
 		fmt.Println("command", cmd.Name, "was executed")
 	}
-
 
 }

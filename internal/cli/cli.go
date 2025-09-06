@@ -122,7 +122,7 @@ func HandlerAgg(s *types.State, cmd Command) error {
 	return nil
 }
 
-func HandlerAddfeed(s *types.State, cmd Command) error {
+func HandlerAddfeed(s *types.State, cmd Command, user database.User) error {
 
 	if len(cmd.Arguments) < 2 {
 		return fmt.Errorf("the register command expects a two argument, the name and the url")
@@ -152,7 +152,31 @@ func HandlerAddfeed(s *types.State, cmd Command) error {
 	fmt.Println("feed successfully saved to database")
 	fmt.Println(feed)
 
+	// very experimentatl
+	currUser := s.Cfg.UserName
+	userID, _ := s.Db.GetUserIDFromName(context.Background(), currUser)
+	url := sql.NullString{String: cmd.Arguments[1], Valid: true}
+	feedID, _ := s.Db.GetFeedIdFromUrl(context.Background(), url)
+
+	feedFollowParams := database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
+		UpdatedAt: sql.NullTime{Time: time.Now(), Valid: true},
+		// UserID: userID,
+		// FeedID: feedID,
+		UserID: uuid.NullUUID{UUID: userID, Valid: true},
+		FeedID: uuid.NullUUID{UUID: feedID, Valid: true},
+	}
+	feed_follow, err := s.Db.CreateFeedFollow(context.Background(), feedFollowParams)
+	if err != nil {
+		return fmt.Errorf("error encountered while handling command follow: %v", err)
+	}
+	feedName, _ := s.Db.GetFeedNameFromFeedId(context.Background(), feed_follow.FeedID.UUID)
+	fmt.Println(feedName)
+	fmt.Println(currUser)
+
 	return nil
+
 }
 
 func HandlerFeeds(s *types.State, cmd Command) error {
@@ -177,7 +201,7 @@ func HandlerFeeds(s *types.State, cmd Command) error {
 
 }
 
-func HandlerFollow(s *types.State, cmd Command) error {
+func HandlerFollow(s *types.State, cmd Command, user database.User) error {
 	if len(cmd.Arguments) == 0 {
 		return fmt.Errorf("the command follow expects a single argument, the url of the rss feed")
 	}
@@ -208,11 +232,8 @@ func HandlerFollow(s *types.State, cmd Command) error {
 	return nil
 }
 
-func HandlerFollowing(s *types.State, cmd Command) error {
-	if len(cmd.Arguments) == 0 {
-		return fmt.Errorf("the command following expects a single argument: the name of the user")
-	}
-	userId, err := s.Db.GetUserIDFromName(context.Background(), cmd.Arguments[0])
+func HandlerFollowing(s *types.State, cmd Command, user database.User) error {
+	userId, err := s.Db.GetUserIDFromName(context.Background(), s.Cfg.UserName)
 	if err != nil {
 		return fmt.Errorf("the user %v could not found in the database", userId)
 	}
