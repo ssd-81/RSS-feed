@@ -152,9 +152,7 @@ func HandlerAddfeed(s *types.State, cmd Command, user database.User) error {
 	fmt.Println("feed successfully saved to database")
 	fmt.Println(feed)
 
-	// very experimentatl
-	currUser := s.Cfg.UserName
-	userID, _ := s.Db.GetUserIDFromName(context.Background(), currUser)
+	userID, _ := s.Db.GetUserIDFromName(context.Background(), user.Name)
 	url := sql.NullString{String: cmd.Arguments[1], Valid: true}
 	feedID, _ := s.Db.GetFeedIdFromUrl(context.Background(), url)
 
@@ -173,7 +171,7 @@ func HandlerAddfeed(s *types.State, cmd Command, user database.User) error {
 	}
 	feedName, _ := s.Db.GetFeedNameFromFeedId(context.Background(), feed_follow.FeedID.UUID)
 	fmt.Println(feedName)
-	fmt.Println(currUser)
+	fmt.Println(user.Name)
 
 	return nil
 
@@ -207,8 +205,7 @@ func HandlerFollow(s *types.State, cmd Command, user database.User) error {
 	}
 	// url := cmd.Arguments[0]
 	// make great amount of checks in these
-	currUser := s.Cfg.UserName
-	userID, _ := s.Db.GetUserIDFromName(context.Background(), currUser)
+	userID, _ := s.Db.GetUserIDFromName(context.Background(), user.Name)
 	url := sql.NullString{String: cmd.Arguments[0], Valid: true}
 	feedID, _ := s.Db.GetFeedIdFromUrl(context.Background(), url)
 
@@ -227,13 +224,13 @@ func HandlerFollow(s *types.State, cmd Command, user database.User) error {
 	}
 	feedName, _ := s.Db.GetFeedNameFromFeedId(context.Background(), feed_follow.FeedID.UUID)
 	fmt.Println(feedName)
-	fmt.Println(currUser)
+	fmt.Println(user.Name)
 
 	return nil
 }
 
 func HandlerFollowing(s *types.State, cmd Command, user database.User) error {
-	userId, err := s.Db.GetUserIDFromName(context.Background(), s.Cfg.UserName)
+	userId, err := s.Db.GetUserIDFromName(context.Background(), user.Name)
 	if err != nil {
 		return fmt.Errorf("the user %v could not found in the database", userId)
 	}
@@ -247,6 +244,26 @@ func HandlerFollowing(s *types.State, cmd Command, user database.User) error {
 		}
 		fmt.Println(i+1, feedName.String)
 	}
+	return nil
+}
+
+func HandlerUnfollow(s *types.State, cmd Command, user database.User) error {
+	if len(cmd.Arguments) == 0 {
+		return fmt.Errorf("the command unfollow expects a single argument, the url of the rss feed")
+	}
+	userID, _ := s.Db.GetUserIDFromName(context.Background(), user.Name)
+	url := sql.NullString{String: cmd.Arguments[0], Valid: true}
+	feedID, _ := s.Db.GetFeedIdFromUrl(context.Background(), url)
+
+	params := database.DeleteFeedParams{
+		UserID: uuid.NullUUID{UUID: userID, Valid: true},
+		FeedID: uuid.NullUUID{UUID: feedID, Valid: true},
+	}
+	err := s.Db.DeleteFeed(context.Background(), params)
+	if err != nil {
+		return fmt.Errorf("error encountered while handling command unfollow: %v", err)
+	}
+	fmt.Println("successfully unfollowed the post")
 	return nil
 }
 

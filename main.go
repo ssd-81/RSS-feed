@@ -44,6 +44,8 @@ func main() {
 	cmds.Register("feeds", cli.HandlerFeeds)
 	cmds.Register("follow", middleware.MiddlewareLoggedIn(cli.HandlerFollow))
 	cmds.Register("following", middleware.MiddlewareLoggedIn(cli.HandlerFollowing))
+	cmds.Register("unfollow", middleware.MiddlewareLoggedIn(cli.HandlerUnfollow))
+
 
 	// cmds.Register("agg", rss.fetchFeed)  : this won't work, because it does not have the same function signature
 

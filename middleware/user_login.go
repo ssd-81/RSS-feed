@@ -27,8 +27,7 @@ func MiddlewareLoggedIn(handler func(s *types.State, cmd cli.Command, user datab
 		if err != nil {
 			return fmt.Errorf("error encountered while retrieving the name of current user: %v", err)
 		}
-		handler(state, c, user)
-		return nil
+		return handler(state, c, user)
 
 	}
 
