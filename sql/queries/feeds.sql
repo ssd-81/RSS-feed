@@ -27,3 +27,12 @@ WHERE url = $1 LIMIT 1;
 -- name: GetFeedNameFromFeedId :one
 SELECT name from feeds 
 WHERE id = $1 LIMIT 1;  
+
+-- name: MarkFeedFetched :exec
+UPDATE feeds
+SET last_fetched_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+WHERE id = $1; 
+
+-- name: GetNextFeedToFetch :one
+SELECT * from feeds 
+order by last_fetched_at NULLS FIRST LIMIT 1;

@@ -25,7 +25,6 @@ type RSSItem struct {
 	PubDate     string `xml:"pubDate"`
 }
 
-// I need to fetch a feed from a given url
 func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	// creating a new http client (we might need to change headers)
 	client := &http.Client{}
@@ -62,3 +61,5 @@ func DecodeEscapedChars(r *RSSFeed) {
 		r.Channel.Item[i].Description = html.EscapeString(r.Channel.Item[i].Description)
 	}
 }
+
+func ScrapeFeeds()
