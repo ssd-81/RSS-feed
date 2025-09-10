@@ -7,6 +7,10 @@ import (
 	"html"
 	"io"
 	"net/http"
+	"fmt"
+
+	"github.com/ssd-81/RSS-feed-/internal/types"
+
 )
 
 type RSSFeed struct {
@@ -62,4 +66,23 @@ func DecodeEscapedChars(r *RSSFeed) {
 	}
 }
 
-func ScrapeFeeds()
+func ScrapeFeeds(ctx context.Context, s *types.State) (error) {
+	
+	lastUpdatedFeed, err := s.Db.GetNextFeedToFetch(context.Background())
+	if err != nil { 
+		return err
+	}
+	err  = s.Db.MarkFeedFetched(context.Background(), lastUpdatedFeed.ID)
+	if err != nil {
+		return err
+	}
+	// double check the below line; highly likely some error would be introduced here
+	feedData, err := FetchFeed(context.Background(), lastUpdatedFeed.Url.String)
+	if err != nil {
+		return err
+	}
+	for _, val := range feedData.Channel.Item {
+		fmt.Println(val.Title)
+	}
+	return nil 
+}

@@ -85,6 +85,26 @@ func (q *Queries) GetFeed(ctx context.Context, name sql.NullString) (Feed, error
 	return i, err
 }
 
+const getFeedFromUrl = `-- name: GetFeedFromUrl :one
+SELECT id, created_at, updated_at, name, url, user_id, last_fetched_at FROM feeds 
+WHERE url = $1 LIMIT 1
+`
+
+func (q *Queries) GetFeedFromUrl(ctx context.Context, url sql.NullString) (Feed, error) {
+	row := q.db.QueryRowContext(ctx, getFeedFromUrl, url)
+	var i Feed
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+		&i.Url,
+		&i.UserID,
+		&i.LastFetchedAt,
+	)
+	return i, err
+}
+
 const getFeedIdFromUrl = `-- name: GetFeedIdFromUrl :one
 SELECT id from feeds 
 WHERE url = $1 LIMIT 1

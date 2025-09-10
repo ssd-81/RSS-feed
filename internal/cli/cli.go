@@ -107,19 +107,26 @@ func HandlerUsers(s *types.State, cmd Command) error {
 
 func HandlerAgg(s *types.State, cmd Command) error {
 	// to be applied
-	// if len(cmd.Arguments) == 0 {
-	// 	return fmt.Errorf("the command agg requires a single argument: the feed url")
-	// }
-	url := "https://www.wagslane.dev/index.xml"
-	rssData, err := rss.FetchFeed(context.Background(), url)
-	if err != nil {
-		return fmt.Errorf("error encounterd : %w", err)
+	if len(cmd.Arguments) == 0 {
+		return fmt.Errorf("the command agg requires a single argument: parse duration (like 1s, 1m , 1h etc)")
 	}
-	rss.DecodeEscapedChars(rssData)
-	fmt.Println(rssData)
-	fmt.Println("agg command executed successfully")
-
-	return nil
+	// url := "https://www.wagslane.dev/index.xml"
+	// rssData, err := rss.FetchFeed(context.Background(), url)
+	// if err != nil {
+	// 	return fmt.Errorf("error encounterd : %w", err)
+	// }
+	// rss.DecodeEscapedChars(rssData)
+	// fmt.Println(rssData)
+	// fmt.Println("agg command executed successfully")
+	fetchDuration, err := time.ParseDuration(cmd.Arguments[0])
+	if err != nil {
+		return fmt.Errorf("error encountered while parsing argument; invalid duration: %v", err)
+	}
+	fmt.Println("we are going into the vortex")
+	ticker := time.NewTicker(fetchDuration)
+	for ; ; <-ticker.C {
+		rss.ScrapeFeeds(context.Background(), s)
+	}
 }
 
 func HandlerAddfeed(s *types.State, cmd Command, user database.User) error {

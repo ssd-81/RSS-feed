@@ -20,6 +20,10 @@ DELETE FROM feeds;
 -- name: GetFeeds :many
 SELECT * FROM feeds;
 
+-- name: GetFeedFromUrl :one
+SELECT * FROM feeds 
+WHERE url = $1 LIMIT 1;
+
 -- name: GetFeedIdFromUrl :one
 SELECT id from feeds 
 WHERE url = $1 LIMIT 1;
