@@ -3,8 +3,10 @@ package cli
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -95,6 +97,9 @@ func HandlerUsers(s *types.State, cmd Command) error {
 	if err != nil {
 		return fmt.Errorf("could not retrieve users from the database")
 	}
+	if len(users) == 0 {
+		return errors.New("no users exists in the database")
+	}
 	for _, value := range users {
 		if value.Name == s.Cfg.UserName {
 			fmt.Println("*", value.Name, "(current)")
@@ -110,14 +115,6 @@ func HandlerAgg(s *types.State, cmd Command) error {
 	if len(cmd.Arguments) == 0 {
 		return fmt.Errorf("the command agg requires a single argument: parse duration (like 1s, 1m , 1h etc)")
 	}
-	// url := "https://www.wagslane.dev/index.xml"
-	// rssData, err := rss.FetchFeed(context.Background(), url)
-	// if err != nil {
-	// 	return fmt.Errorf("error encounterd : %w", err)
-	// }
-	// rss.DecodeEscapedChars(rssData)
-	// fmt.Println(rssData)
-	// fmt.Println("agg command executed successfully")
 	fetchDuration, err := time.ParseDuration(cmd.Arguments[0])
 	if err != nil {
 		return fmt.Errorf("error encountered while parsing argument; invalid duration: %v", err)
@@ -125,7 +122,10 @@ func HandlerAgg(s *types.State, cmd Command) error {
 	fmt.Println("we are going into the vortex")
 	ticker := time.NewTicker(fetchDuration)
 	for ; ; <-ticker.C {
-		rss.ScrapeFeeds(context.Background(), s)
+		err = rss.ScrapeFeeds(context.Background(), s)
+		if err != nil {
+			return err
+		}
 	}
 }
 
@@ -272,6 +272,27 @@ func HandlerUnfollow(s *types.State, cmd Command, user database.User) error {
 	}
 	fmt.Println("successfully unfollowed the post")
 	return nil
+}
+
+func HandlerBrowse(s *types.State, cmd Command) error {
+	numPosts := "2"
+	if len(cmd.Arguments) > 0 {
+		numPosts = cmd.Arguments[0]
+	}
+	i64, err := strconv.ParseInt(numPosts, 10, 32) // base 10, bit size 32 for int32
+	if err != nil {
+		fmt.Println("Conversion error:", err)
+		return err
+	}
+	data , err := s.Db.GetPostsForUsers(context.Background(), int32(i64))
+	if err != nil {
+		return fmt.Errorf("could not retrive data from database: ", err)
+	}
+	for i, val := range data {
+		fmt.Print(i + 1, ". ", val.Title.String, ": ")
+		fmt.Println(val.Description.String)
+	}
+	return nil 
 }
 
 func (c *Commands) Run(s *types.State, cmd Command) error {

@@ -2,15 +2,18 @@ package rss
 
 import (
 	"context"
+	"database/sql"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"html"
 	"io"
 	"net/http"
-	"fmt"
+	"time"
 
+	"github.com/google/uuid"
+	"github.com/ssd-81/RSS-feed-/internal/database"
 	"github.com/ssd-81/RSS-feed-/internal/types"
-
 )
 
 type RSSFeed struct {
@@ -36,7 +39,6 @@ func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	if err != nil {
 		return nil, errors.New("http request failed to the provided url")
 	}
-	// keep eye on this part; might cause problems
 	req.Header.Set("User-Agent", "gator")
 	res, err := client.Do(req)
 	if err != nil {
@@ -46,7 +48,6 @@ func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	if err != nil {
 		return nil, errors.New("the body could not be parsed")
 	}
-	// I am not very sure with this, this might cause some problems
 	var rssData RSSFeed
 	err = xml.Unmarshal(body, &rssData)
 	if err != nil {
@@ -66,13 +67,15 @@ func DecodeEscapedChars(r *RSSFeed) {
 	}
 }
 
-func ScrapeFeeds(ctx context.Context, s *types.State) (error) {
-	
+func ScrapeFeeds(ctx context.Context, s *types.State) error {
+	fmt.Println("-- scrape feeds called --")
 	lastUpdatedFeed, err := s.Db.GetNextFeedToFetch(context.Background())
-	if err != nil { 
+	if err != nil {
+		fmt.Println("error encountered 1", err)
 		return err
 	}
-	err  = s.Db.MarkFeedFetched(context.Background(), lastUpdatedFeed.ID)
+	// fmt.Println(lastUpdatedFeed)
+	err = s.Db.MarkFeedFetched(context.Background(), lastUpdatedFeed.ID)
 	if err != nil {
 		return err
 	}
@@ -81,8 +84,37 @@ func ScrapeFeeds(ctx context.Context, s *types.State) (error) {
 	if err != nil {
 		return err
 	}
+	// fmt.Println(feedData)
 	for _, val := range feedData.Channel.Item {
+		// converting the RFC22 -> RFC1123Z (time.Time)
+		t, err := time.Parse(time.RFC1123Z, val.PubDate)
+		if err != nil {
+			return err
+		}
+
+		// make sure the following params are properly stored in the db
+		params := database.CreatePostParams{
+			ID:          uuid.New(),
+			CreatedAt:   sql.NullTime{Time: time.Now(), Valid: true},
+			UpdatedAt:   sql.NullTime{Time: time.Now(), Valid: true},
+			Title:       sql.NullString{String: val.Title, Valid: true},
+			Url:         sql.NullString{String: val.Link, Valid: true},
+			Description: sql.NullString{String: val.Description, Valid: true},
+			PublishedAt: sql.NullTime{Time: t, Valid: true},
+			FeedID:      uuid.NullUUID{UUID: lastUpdatedFeed.ID, Valid: true},
+
+
+		}
+		post, err := s.Db.CreatePost(context.Background(), params)
+		if err != nil {
+			fmt.Println(err)
+			fmt.Println(post)
+		} else {
+			fmt.Println("post saved to db successfully")
+		}
 		fmt.Println(val.Title)
+		fmt.Println()
 	}
-	return nil 
+
+	return nil
 }

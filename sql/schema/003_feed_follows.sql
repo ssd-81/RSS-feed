@@ -7,6 +7,6 @@ CONSTRAINT unique_user_feed UNIQUE (user_id, feed_id));
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE feeds_follows·;
+DROP TABLE feeds_follows;
 -- +goose StatementEnd
 

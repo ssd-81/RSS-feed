@@ -45,7 +45,7 @@ func main() {
 	cmds.Register("follow", middleware.MiddlewareLoggedIn(cli.HandlerFollow))
 	cmds.Register("following", middleware.MiddlewareLoggedIn(cli.HandlerFollowing))
 	cmds.Register("unfollow", middleware.MiddlewareLoggedIn(cli.HandlerUnfollow))
-
+	cmds.Register("browse", cli.HandlerBrowse)
 
 	// cmds.Register("agg", rss.fetchFeed)  : this won't work, because it does not have the same function signature
 
@@ -62,7 +62,7 @@ func main() {
 	// func signature of Run : func (c *Commands) Run(s *types.State, cmd Command) error
 	if err := cmds.Run(&stateData, cmd); err != nil {
 		fmt.Println(err)
-		log.Fatal(err)
+		// log.Fatal(err)
 	} else {
 		fmt.Println("command", cmd.Name, "was executed")
 	}
