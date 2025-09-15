@@ -12,6 +12,13 @@ RSS feed accumulator using Golang, postGreSQL
 3. Ready to go
 
 
+## Configuration
+- configure postgres
+- at the home directory of your system, create a file named ".gatorconfig.json"
+> the "." is there
+
+
+
 ## Usage
 `Note: the usage is based on the generation of binaries as per the above instructions`
 ---
