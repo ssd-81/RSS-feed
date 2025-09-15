@@ -294,6 +294,22 @@ func HandlerBrowse(s *types.State, cmd Command) error {
 	}
 	return nil 
 }
+func HandlerHelp(s *types.State, cmd Command) error {
+	fmt.Println("Available commands:")
+	fmt.Println("- login <username> - Authenticate and log into the application with specified username")
+	fmt.Println("- register <username> - Create a new user account with the given username")
+	fmt.Println("- reset - Reset application state or configuration to default settings")
+	fmt.Println("- users - Display list of all registered users in the system")
+	fmt.Println("- agg <time-interval> - Aggregate data over specified time interval (1s, 1m, 1h)")
+	fmt.Println("- addfeed <name> <url> - Add a new RSS/news feed with custom name and URL")
+	fmt.Println("- feeds - List all configured feeds in the system")
+	fmt.Println("- follow - Follow feeds or users (interactive mode)")
+	fmt.Println("- following - Show list of feeds/users currently being followed")
+	fmt.Println("- unfollow <url> - Stop following a specific feed by its URL")
+	fmt.Println("- browse <number> - Browse and display specified number of recent posts")
+	fmt.Println("")
+	return nil
+}
 
 func (c *Commands) Run(s *types.State, cmd Command) error {
 	// runs a given command with the provided state if it exists
